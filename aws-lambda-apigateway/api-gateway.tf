@@ -1,8 +1,3 @@
-## LOCALS 
-locals {
-   domain_name = "che-test.exhn.io"
-}
-
 ## RESOURCES
 
 resource "aws_api_gateway_rest_api" "example" {
@@ -86,7 +81,7 @@ provider "aws" {
 resource "aws_acm_certificate" "cert" {
   count = var.enable_certificate ? 1 : 0
   provider = aws.useast1
-  domain_name       = "${local.domain_name}"
+  domain_name       = "${var.custom_domain_name}"
   validation_method = "DNS"
 
   lifecycle {
@@ -97,7 +92,7 @@ resource "aws_acm_certificate" "cert" {
 resource "aws_api_gateway_domain_name" "example" {
   count = var.enable_certificate ? 1 : 0
   certificate_arn = aws_acm_certificate.cert[0].arn
-  domain_name     = local.domain_name
+  domain_name     = var.custom_domain_name
 }
 
 resource "aws_api_gateway_base_path_mapping" "example" {
@@ -106,9 +101,3 @@ resource "aws_api_gateway_base_path_mapping" "example" {
   stage_name  = aws_api_gateway_deployment.example.stage_name
   domain_name = aws_api_gateway_domain_name.example[0].domain_name
 }
-
-
-
-
-
-
